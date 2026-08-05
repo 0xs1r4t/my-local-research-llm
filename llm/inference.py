@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from llama_cpp import Llama
+from llama_cpp import Llama, CreateCompletionResponse
+from typing import cast
 
 load_dotenv()
 
@@ -19,5 +20,8 @@ def get_model() -> Llama:
 
 def generate(prompt: str, max_tokens: int = 512, stop: list[str] | None = None) -> str:
     llm = get_model()
-    result = llm(prompt, max_tokens=max_tokens, stop=stop or ["</s>", "[INST]"])
+    result = cast(
+        CreateCompletionResponse,
+        llm(prompt, max_tokens=max_tokens, stop=stop or ["<|im_end|>", "<|endoftext|>"], stream=False),
+    )
     return result["choices"][0]["text"].strip()
